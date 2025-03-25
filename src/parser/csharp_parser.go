@@ -345,11 +345,7 @@ func (p *CSharpParser) tokenize() error {
 
 // cleanupText는 텍스트에서 불필요한 문자나 흰색 공간을 정리합니다.
 func cleanupText(text string) string {
-	// 텍스트가 너무 긴 경우 잘라서 반환 (특수 문자 제거)
-	if len(text) > 1000 {
-		// 문자열 끝에 말줄임표 추가
-		text = text[:997] + "..."
-	}
+	// 원본 텍스트를 그대로 반환
 	return text
 }
 
@@ -411,22 +407,25 @@ func (p *CSharpParser) parseTokens() ([]model.SkeletonNode, []model.Chunk, error
 				// 메서드 찾기
 				methods := p.findMethodsInRange(classNamePos, classEnd)
 				for _, method := range methods {
-					if method.startPos >= 0 && method.endPos <= len(originalSource) && method.startPos < method.endPos {
-						methodContent := originalSource[method.startPos:method.endPos]
-						methodContent = cleanupText(methodContent)
-						methodMD5 := calculateMD5(methodContent)
+					// 메서드 코드 전체를 직접 추출한 내용 사용
+					methodContent := method.content
+					// 전체 메서드 코드를 정리
+					methodContent = cleanupText(methodContent)
+					// MD5 해시 계산
+					methodMD5 := calculateMD5(methodContent)
 
-						classNode.Members = append(classNode.Members, model.Member{
-							Type: "method",
-							Name: method.name,
-							MD5:  methodMD5,
-						})
+					// 멤버 추가
+					classNode.Members = append(classNode.Members, model.Member{
+						Type: "method",
+						Name: method.name,
+						MD5:  methodMD5,
+					})
 
-						chunks = append(chunks, model.Chunk{
-							MD5:  methodMD5,
-							Text: methodContent,
-						})
-					}
+					// 청크 추가
+					chunks = append(chunks, model.Chunk{
+						MD5:  methodMD5,
+						Text: methodContent,
+					})
 				}
 
 				nodes = append(nodes, *classNode)
@@ -464,21 +463,53 @@ func (p *CSharpParser) parseTokens() ([]model.SkeletonNode, []model.Chunk, error
 	return nodes, chunks, nil
 }
 
-// methodInfo는 메서드 정보를 저장하는 구조체입니다.
-type methodInfo struct {
-	name     string
-	startPos int
-	endPos   int
+// extractMethodContent는 메서드의 전체 내용을 추출합니다. 
+// 원본 소스에서 직접 추출하므로 토큰 범위 문제를 해결합니다.
+func extractMethodContent(source string, startLine, endLine int) string {
+	lines := strings.Split(source, "\n")
+	
+	if startLine < 0 {
+		startLine = 0
+	}
+	
+	if endLine >= len(lines) {
+		endLine = len(lines) - 1
+	}
+	
+	// 시작 라인 조정 (주석 포함)
+	for i := startLine - 1; i >= 0; i-- {
+		line := strings.TrimSpace(lines[i])
+		if strings.HasPrefix(line, "//") || line == "" {
+			startLine = i
+		} else {
+			break
+		}
+	}
+	
+	var result strings.Builder
+	for i := startLine; i <= endLine; i++ {
+		result.WriteString(lines[i])
+		if i < endLine {
+			result.WriteString("\n")
+		}
+	}
+	
+	return result.String()
 }
 
 // findMethodsInRange는 주어진 범위 내에서 모든 메서드를 찾습니다.
 func (p *CSharpParser) findMethodsInRange(start, end int) []methodInfo {
 	var methods []methodInfo
 	
+	// 원본 소스
+	originalSource := string(p.content)
+	
 	for i := start; i < end; i++ {
 		if isMethodStart(p.tokens, i) {
 			methodName := getMethodName(p.tokens, i)
-			methodStart := p.tokens[i].Start
+			
+			// 메서드 시작 위치 찾기 - 라인 번호 기준
+			startLine := p.tokens[i].Line - 1  // 0-based 라인 번호로 변환
 			
 			// 메서드 본문 블록 찾기
 			methodBodyStart := i
@@ -495,10 +526,17 @@ func (p *CSharpParser) findMethodsInRange(start, end int) []methodInfo {
 				continue
 			}
 			
+			// 메서드 끝 라인 번호
+			endLine := p.tokens[methodEnd].Line - 1  // 0-based 라인 번호
+			
+			// 메서드 내용 추출
+			methodContent := extractMethodContent(originalSource, startLine, endLine)
+			
 			methods = append(methods, methodInfo{
 				name:     methodName,
-				startPos: methodStart,
+				startPos: p.tokens[i].Start,
 				endPos:   p.tokens[methodEnd].End,
+				content:  methodContent,  // 직접 추출한 메서드 내용
 			})
 			
 			// 다음 토큰으로 건너뛰기
@@ -702,4 +740,12 @@ func needsSpace(current, next Token) bool {
 func calculateMD5(content string) string {
 	hash := md5.Sum([]byte(content))
 	return hex.EncodeToString(hash[:])
+}
+
+// methodInfo는 메서드 정보를 저장하는 구조체입니다.
+type methodInfo struct {
+	name     string
+	startPos int
+	endPos   int
+	content  string  // 직접 추출한 메서드 내용
 } 

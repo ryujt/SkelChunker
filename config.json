@@ -1,6 +1,7 @@
 {
     "folders": [
-      "D:\\Projects\\temp\\HelloAPI"
+        "D:\\Projects\\Personal\\SkelChunker\\test",
+        "D:\\Projects\\temp\\HelloAPI"        
     ],
     "ignore-folders": [
         "node_modules",
@@ -11,26 +12,14 @@
         "obj",
         "venv",
         "docs",
-        "test",
         ".git",
         ".idea",
         ".vscode",
         ".DS_Store",
         ".env",
         ".env.local"
-        
     ],
     "parsers": {
-      ".java": "java_parser",
-      ".c": "c_parser",
-      ".cpp": "cpp_parser",
-      ".cs": "csharp_parser",
-      ".py": "python_parser",
-      ".js": "javascript_parser",
-      ".ts": "typescript_parser",
-      ".go": "go_parser",
-      ".kt": "kotlin_parser",
-      ".php": "php_parser",
-      ".html": "html_parser"
+        ".cs": "csharp_parser"
     }
-  }
+}

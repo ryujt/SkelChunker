@@ -1,0 +1,93 @@
+{
+  "path": "D:\\Projects\\Personal\\SkelChunker\\test",
+  "filename": "TestClass.cs",
+  "md5": "1487d03d53c16157b14c140f3355f14f",
+  "summary": "",
+  "embeddings": null,
+  "skeleton": [
+    {
+      "type": "class",
+      "name": "TestClass",
+      "members": [
+        {
+          "md5": "f02fefa7c93bf221604d68c3787221a8",
+          "type": "method",
+          "name": "TestClass"
+        },
+        {
+          "md5": "b62dd91a54382705b38d5e7809e4d716",
+          "type": "method",
+          "name": "PrintInfo"
+        },
+        {
+          "md5": "8e61b967136af4ccf96ad1efa617eb2e",
+          "type": "method",
+          "name": "ShowDescription"
+        }
+      ]
+    },
+    {
+      "type": "class",
+      "name": "ITestInterface",
+      "members": [
+        {
+          "md5": "ec316540e851bf828725aad58359ccd3",
+          "type": "method",
+          "name": "TestMethod"
+        }
+      ]
+    },
+    {
+      "type": "class",
+      "name": "TestStruct",
+      "members": [
+        {
+          "md5": "835488e36d981a5d4ff83243e16c8376",
+          "type": "method",
+          "name": "TestStruct"
+        },
+        {
+          "md5": "5f8f7fe702336d1d40034f1128988a66",
+          "type": "method",
+          "name": "GetDistance"
+        }
+      ]
+    },
+    {
+      "type": "etc",
+      "name": ""
+    }
+  ],
+  "chunks": [
+    {
+      "md5": "f02fefa7c93bf221604d68c3787221a8",
+      "text": " // 생성자\r\n        public TestClass(string name)\r\n        {\r\n            Name = name;\r\n",
+      "embeddings": null
+    },
+    {
+      "md5": "b62dd91a54382705b38d5e7809e4d716",
+      "text": "  // 메서드\r\n        public void PrintInfo()\r\n        {\r\n            Console.WriteLine($\"",
+      "embeddings": null
+    },
+    {
+      "md5": "8e61b967136af4ccf96ad1efa617eb2e",
+      "text": "set; }\r\n            \r\n            public void ShowDescription()\r\n            {\r\n                ",
+      "embeddings": null
+    },
+    {
+      "md5": "ec316540e851bf828725aad58359ccd3",
+      "text": "   public interface ITestInterface\r\n    {\r\n        ",
+      "embeddings": null
+    },
+    {
+      "md5": "835488e36d981a5d4ff83243e16c8376",
+      "text": "ublic int X;\r\n        public int Y;\r\n        \r\n        public TestStruct(int x, int y)",
+      "embeddings": null
+    },
+    {
+      "md5": "5f8f7fe702336d1d40034f1128988a66",
+      "text": "           Y = y;\r\n        }\r\n        \r\n        public double GetDistance()\r\n    ",
+      "embeddings": null
+    }
+  ]
+}

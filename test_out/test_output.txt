@@ -1,0 +1,112 @@
+==== Skeleton ===
+[구조 정보]
+1. TestClass (class)
+   - TestClass (method)
+   - PrintInfo (method)
+   - ShowDescription (method)
+2. ITestInterface (interface/class)
+   - TestMethod (method) 
+3. TestStruct (struct/class)
+   - TestStruct (method)
+   - GetDistance (method)
+4. 전역 코드 (etc)
+
+==== 청크 내용 ====
+[1. TestClass 클래스 전체]
+석
+    public class TestClass
+    {
+        // 프로퍼티
+        public int Id { get; set; }
+        public string Name { get; private set; }
+        
+        // 생성자
+        public TestClass(string name)
+        {
+            Name = name;
+            Id = 0;
+        }
+        
+        // 메서드
+        public void PrintInfo()
+        {
+            Console.WriteLine($"Id: {Id}, Name: {Name}");
+        }
+        
+        // 중첩 클래스
+        public class NestedClass
+        {
+            public string Description { get; set; }
+            
+            public void ShowDescription()
+            {
+                Console.WriteLine(
+
+[2. TestClass 클래스의 메서드: TestClass]
+ // 생성자
+        public TestClass(string name)
+        {
+            Name = name;
+
+[3. TestClass 클래스의 메서드: PrintInfo]
+  // 메서드
+        public void PrintInfo()
+        {
+            Console.WriteLi
+ne($"
+
+[4. TestClass 클래스의 메서드: ShowDescription]
+set; }
+            
+            public void ShowDescription()
+            {
+              
+
+[5. ITestInterface 인터페이스 전체]
+     }
+    }
+    
+    // 인터페이스
+    public interface ITestInterface
+   {
+        void Te
+
+[6. ITestInterface 인터페이스의 메서드: TestMethod]
+   public interface ITestInterface
+    {
+        
+
+[7. TestStruct 구조체 전체]
+tProperty { get; }
+    }
+    
+    // 구조체
+    public struct TestStruct
+  {
+        public int X;
+        public int Y;
+        
+        public TestStruct(int x, int y)
+        {
+            X = x;
+            Y = y;
+        }
+        
+        public double GetDistance()
+        {
+
+[8. TestStruct 구조체의 메서드: TestStruct]
+ublic int X;
+        public int Y;
+        
+        public TestStruct(int x, int y)
+
+[9. TestStruct 구조체의 메서드: GetDistance]
+           Y = y;
+        }
+        
+        public double GetDistance()
+    
+
+[10. 전역 코드]
+usingSystem;usingSystem.Collections.Generic;usingSystem.Linq;namespaceTestNamespace{public//public//public//publicrecordTestRecord(stringTitle,stringDescription);} 

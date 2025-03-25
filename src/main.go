@@ -39,8 +39,11 @@ func main() {
 		os.Exit(1)
 	}
 
-	// 파서 팩토리 초기화
+	// 파서 팩토리 생성
 	parserFactory := parser.NewParserFactory()
+
+	// 파서 등록
+	parserFactory.RegisterParser(parser.NewCSharpParser())
 
 	// 분석기 초기화
 	analyzer := analyzer.NewAnalyzer(parserFactory)

@@ -1,6 +1,8 @@
 package parser
 
-import "SkelChunker/src/model"
+import (
+	"SkelChunker/src/model"
+)
 
 // Parser는 소스 코드를 분석하여 스켈레톤과 청크를 추출하는 인터페이스입니다.
 type Parser interface {

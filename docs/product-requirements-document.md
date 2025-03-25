@@ -111,6 +111,11 @@
       "md5": "청크 내용의 MD5",
       "type": "function",
       "name": "functionName"
+    },
+    {
+      "md5": "청크 내용의 MD5",
+      "type": "etc",
+      "name": "클래스 선언 밖의 기타 코드들들"
     }
   ],
   "chunks": [

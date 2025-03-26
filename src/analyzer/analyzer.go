@@ -66,6 +66,17 @@ func (a *Analyzer) AnalyzeFile(filePath string) (*model.AnalysisResult, error) {
 		return nil, fmt.Errorf("failed to parse file: %w", err)
 	}
 
+	// 구조화된 코드가 없는 경우 (skeleton이 nil이거나 비어있는 경우)
+	if skeleton == nil || len(skeleton) == 0 {
+		// 파일 전체를 하나의 청크로 생성
+		chunks = []model.Chunk{
+			{
+				MD5:  md5Hash,
+				Text: string(content),
+			},
+		}
+	}
+
 	// 결과 생성
 	result := &model.AnalysisResult{
 		Path:     filepath.Dir(filePath),
@@ -73,6 +84,17 @@ func (a *Analyzer) AnalyzeFile(filePath string) (*model.AnalysisResult, error) {
 		MD5:      md5Hash,
 		Skeleton: skeleton,
 		Chunks:   chunks,
+	}
+
+	// 파일 전체를 처리한 후 최종 검증
+	// 청크가 비어있으면 파일 전체를 청크로 추가
+	if result.Chunks == nil || len(result.Chunks) == 0 {
+		result.Chunks = []model.Chunk{
+			{
+				MD5:  md5Hash,
+				Text: string(content),
+			},
+		}
 	}
 
 	return result, nil

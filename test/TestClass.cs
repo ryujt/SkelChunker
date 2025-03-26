@@ -57,7 +57,7 @@ namespace TestNamespace
         
         public double GetDistance()
         {
-            return Math.Sqrt(X * X + Y * Y);
+            return Math.Sqrt(X1 * X1 + Y2 * Y2);
         }
     }
     

@@ -112,6 +112,20 @@ func (p *CSharpParser) Parse(sourceCode string) ([]model.SkeletonNode, []model.C
 		return nil, nil, fmt.Errorf("parsing failed: %w", err)
 	}
 
+	// 클래스/메서드가 없는 파일인 경우 전체 파일을 청크로 추가
+	if len(nodes) == 0 {
+		// 파일 전체 MD5 계산
+		fileMD5 := calculateMD5(sourceCode)
+		
+		// 파일 전체를 하나의 청크로 추가
+		chunks = []model.Chunk{
+			{
+				MD5:  fileMD5,
+				Text: sourceCode,
+			},
+		}
+	}
+
 	return nodes, chunks, nil
 }
 
@@ -357,11 +371,15 @@ func (p *CSharpParser) parseTokens() ([]model.SkeletonNode, []model.Chunk, error
 	// 전체 소스 코드 텍스트
 	originalSource := string(p.content)
 
+	// 클래스/인터페이스/구조체/레코드가 있는지 확인
+	hasStructuredContent := false
+
 	for i := 0; i < len(p.tokens); i++ {
 		token := p.tokens[i]
 
 		// 클래스/인터페이스/구조체/레코드 처리
 		if token.Type == TokenKeyword && (token.Value == "class" || token.Value == "interface" || token.Value == "struct" || token.Value == "record") {
+			hasStructuredContent = true
 			// 클래스 이름 찾기
 			className := ""
 			classStart := i
@@ -431,6 +449,17 @@ func (p *CSharpParser) parseTokens() ([]model.SkeletonNode, []model.Chunk, error
 			// 다음 토큰으로 건너뛰기
 			i = classEnd
 		}
+	}
+
+	// 구조화된 내용이 없거나 nodes가 비어있는 경우 파일 전체를 청크로 처리
+	if !hasStructuredContent || len(nodes) == 0 {
+		// 파일 전체 내용을 청크로 추가
+		fileContent := cleanupText(originalSource)
+		fileMD5 := calculateMD5(fileContent)
+		chunks = append(chunks, model.Chunk{
+			MD5:  fileMD5,
+			Text: fileContent,
+		})
 	}
 
 	return nodes, chunks, nil

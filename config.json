@@ -1,7 +1,6 @@
 {
     "folders": [
-        "D:\\Projects\\Personal\\SkelChunker\\test",
-        "D:\\Projects\\temp\\HelloAPI"        
+        "D:\\Projects\\Personal\\SkelChunker\\test"
     ],
     "ignore-folders": [
         "node_modules",

@@ -353,7 +353,7 @@ func cleanupText(text string) string {
 func (p *CSharpParser) parseTokens() ([]model.SkeletonNode, []model.Chunk, error) {
 	var nodes []model.SkeletonNode
 	var chunks []model.Chunk
-	var globalTokens []Token
+	existingChunks := make(map[string]model.Chunk)
 
 	// 전체 소스 코드 텍스트
 	originalSource := string(p.content)
@@ -377,14 +377,12 @@ func (p *CSharpParser) parseTokens() ([]model.SkeletonNode, []model.Chunk, error
 			}
 			
 			if className == "" {
-				globalTokens = append(globalTokens, token)
 				continue // 클래스 이름을 찾지 못함
 			}
 
 			// 클래스 끝 위치 찾기
 			classEnd := p.findBlockEnd(classNamePos)
 			if classEnd == -1 {
-				globalTokens = append(globalTokens, token)
 				continue
 			}
 
@@ -421,11 +419,17 @@ func (p *CSharpParser) parseTokens() ([]model.SkeletonNode, []model.Chunk, error
 						MD5:  methodMD5,
 					})
 
-					// 청크 추가
-					chunks = append(chunks, model.Chunk{
-						MD5:  methodMD5,
-						Text: methodContent,
-					})
+					// 기존 청크와 MD5 비교
+					if existingChunk, exists := existingChunks[methodMD5]; exists {
+						// 기존 청크가 있으면 그대로 사용
+						chunks = append(chunks, existingChunk)
+					} else {
+						// 새로운 청크 생성
+						chunks = append(chunks, model.Chunk{
+							MD5:  methodMD5,
+							Text: methodContent,
+						})
+					}
 				}
 
 				nodes = append(nodes, *classNode)
@@ -433,30 +437,6 @@ func (p *CSharpParser) parseTokens() ([]model.SkeletonNode, []model.Chunk, error
 
 			// 다음 토큰으로 건너뛰기
 			i = classEnd
-		} else {
-			// 클래스 외부 코드
-			globalTokens = append(globalTokens, token)
-		}
-	}
-
-	// 전역 코드가 있으면 추가
-	if len(globalTokens) > 0 {
-		var globalCode strings.Builder
-		for i, token := range globalTokens {
-			if token.Type != TokenWhitespace && token.Type != TokenComment {
-				globalCode.WriteString(token.Value)
-				if i+1 < len(globalTokens) && needsSpace(token, globalTokens[i+1]) {
-					globalCode.WriteString(" ")
-				}
-			}
-		}
-		
-		if globalCode.Len() > 0 {
-			nodes = append(nodes, model.SkeletonNode{
-				Type: "etc",
-				Name: "",
-				MD5:  "",  // MD5 제거
-			})
 		}
 	}
 

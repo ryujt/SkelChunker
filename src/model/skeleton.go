@@ -27,7 +27,6 @@ type AnalysisResult struct {
 	Path       string         `json:"path"`
 	Filename   string        `json:"filename"`
 	MD5        string        `json:"md5"`
-	Summary    string        `json:"summary"`
 	Embeddings []float64     `json:"embeddings"`
 	Skeleton   []SkeletonNode `json:"skeleton"`
 	Chunks     []Chunk       `json:"chunks"`

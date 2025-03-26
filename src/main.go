@@ -56,14 +56,12 @@ func main() {
 			APIKey:     cfg.Embedding.APIKey,
 			ModelName:  cfg.Embedding.ModelName,
 			VectorDim:  cfg.Embedding.VectorDim,
-			TestMode:   cfg.Embedding.TestMode,
 			MaxTextSize: cfg.Embedding.MaxTextSize,
 		}
 		
 		embeddingService = embeddings.NewOpenAIEmbedding(
 			cfg.Embedding.APIKey,
 			cfg.Embedding.ModelName,
-			cfg.Embedding.TestMode,
 			cfg.Embedding.VectorDim,
 		)
 		

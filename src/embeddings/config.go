@@ -5,7 +5,6 @@ type Config struct {
 	APIKey     string
 	ModelName  string
 	VectorDim  int
-	TestMode   bool
 	MaxTextSize int
 }
 
@@ -15,7 +14,6 @@ func DefaultConfig() *Config {
 		APIKey:     "",
 		ModelName:  "text-embedding-3-large",
 		VectorDim:  3072,
-		TestMode:   false,
 		MaxTextSize: 24 * 1024, // 24KB 제한
 	}
 } 

@@ -20,12 +20,11 @@ type OpenAIEmbedding struct {
 	apiKey      string
 	client      *openai.Client
 	modelName   openai.EmbeddingModel
-	testMode    bool
 	vectorDim   int
 }
 
 // NewOpenAIEmbedding은 OpenAIEmbedding의 새 인스턴스를 생성합니다.
-func NewOpenAIEmbedding(apiKey string, modelName string, testMode bool, vectorDim int) *OpenAIEmbedding {
+func NewOpenAIEmbedding(apiKey string, modelName string, vectorDim int) *OpenAIEmbedding {
 	if apiKey == "" {
 		apiKey = os.Getenv("OPENAI_API_KEY")
 	}
@@ -48,22 +47,12 @@ func NewOpenAIEmbedding(apiKey string, modelName string, testMode bool, vectorDi
 		apiKey:    apiKey,
 		client:    client,
 		modelName: embeddingModel,
-		testMode:  testMode,
 		vectorDim: vectorDim,
 	}
 }
 
 // CreateEmbedding은 주어진 텍스트에 대한 임베딩을 생성합니다.
 func (e *OpenAIEmbedding) CreateEmbedding(text string) ([]float32, error) {
-	// 테스트 모드인 경우 더미 임베딩 반환
-	if e.testMode {
-		dummyEmbedding := make([]float32, e.vectorDim)
-		for i := 0; i < e.vectorDim; i++ {
-			dummyEmbedding[i] = float32(i) / float32(e.vectorDim)
-		}
-		return dummyEmbedding, nil
-	}
-
 	// 임베딩 요청 생성
 	embeddingReq := openai.EmbeddingRequest{
 		Input: []string{text},

@@ -19,7 +19,6 @@ type EmbeddingConfig struct {
 	APIKey     string `json:"api-key"`
 	ModelName  string `json:"model-name"`
 	VectorDim  int    `json:"vector-dim"`
-	TestMode   bool   `json:"test-mode"`
 	MaxTextSize int   `json:"max-text-size"`
 }
 

@@ -210,64 +210,101 @@ func (a *Analyzer) SaveResult(result *model.AnalysisResult) error {
 	outputFileName := baseFileName[:len(baseFileName)-len(ext)] + ".SkelChunker"
 	outputPath := filepath.Join(result.Path, outputFileName)
 
-	// 임베딩 배열을 한 줄로 마샬링
-	compactResult := CompactResult{
-		Path:     result.Path,
-		Filename: result.Filename,
-		MD5:      result.MD5,
-		Skeleton: result.Skeleton,
-	}
-
-	// 파일 전체 임베딩 처리
-	if result.Embeddings != nil {
-		// 임베딩 배열을 한 줄로 마샬링
-		embeddings, err := json.Marshal(result.Embeddings)
-		if err != nil {
-			return fmt.Errorf("failed to marshal embeddings: %w", err)
-		}
-		// 줄바꿈과 공백을 제거하여 한 줄로 만들기
-		compactResult.Embeddings = bytes.ReplaceAll(
-			bytes.ReplaceAll(embeddings, []byte("\n"), []byte("")),
-			[]byte(" "), []byte(""),
-		)
-	}
-
-	// 청크 임베딩 처리
-	compactResult.Chunks = make([]CompactChunk, len(result.Chunks))
-	for i, chunk := range result.Chunks {
-		compactChunk := CompactChunk{
-			MD5:  chunk.MD5,
-			Text: chunk.Text,
-		}
-		if chunk.Embeddings != nil {
-			// 청크 임베딩을 한 줄로 마샬링
-			embeddings, err := json.Marshal(chunk.Embeddings)
-			if err != nil {
-				return fmt.Errorf("failed to marshal chunk embedding: %w", err)
-			}
-			// 줄바꿈과 공백을 제거하여 한 줄로 만들기
-			compactChunk.Embeddings = bytes.ReplaceAll(
-				bytes.ReplaceAll(embeddings, []byte("\n"), []byte("")),
-				[]byte(" "), []byte(""),
-			)
-		}
-		compactResult.Chunks[i] = compactChunk
-	}
-
-	// 최종 JSON 변환 (임베딩 배열은 한 줄로, 나머지는 들여쓰기)
+	// JSON 출력 버퍼
 	var buf bytes.Buffer
-	encoder := json.NewEncoder(&buf)
-	encoder.SetEscapeHTML(false)
-	encoder.SetIndent("", "  ")
 	
-	if err := encoder.Encode(compactResult); err != nil {
-		return fmt.Errorf("failed to encode result: %w", err)
+	// JSON 객체 시작
+	buf.WriteString("{\n")
+	
+	// 기본 필드 작성
+	buf.WriteString(fmt.Sprintf("  \"path\": %s,\n", jsonString(result.Path)))
+	buf.WriteString(fmt.Sprintf("  \"filename\": %s,\n", jsonString(result.Filename)))
+	buf.WriteString(fmt.Sprintf("  \"md5\": %s,\n", jsonString(result.MD5)))
+	
+	// 임베딩이 있으면 한 줄로 직접 작성
+	if result.Embeddings != nil {
+		buf.WriteString("  \"embeddings\": [")
+		for i, emb := range result.Embeddings {
+			if i > 0 {
+				buf.WriteString(", ")
+			}
+			
+			// 내부 임베딩 배열을 한 줄로 작성
+			embedBytes, _ := json.Marshal(emb)
+			// 모든 공백 제거
+			embedStr := string(embedBytes)
+			embedStr = strings.ReplaceAll(embedStr, " ", "")
+			embedStr = strings.ReplaceAll(embedStr, "\n", "")
+			
+			// 콤마 뒤에 공백 추가 (가독성)
+			embedStr = strings.ReplaceAll(embedStr, ",", ", ")
+			
+			buf.WriteString(embedStr)
+		}
+		buf.WriteString("],\n")
 	}
-
+	
+	// 스켈레톤 객체 마샬링
+	skeletonBytes, err := json.MarshalIndent(result.Skeleton, "  ", "  ")
+	if err != nil {
+		return fmt.Errorf("failed to marshal skeleton: %w", err)
+	}
+	buf.WriteString("  \"skeleton\": ")
+	buf.Write(skeletonBytes)
+	buf.WriteString(",\n")
+	
+	// 청크 배열 시작
+	buf.WriteString("  \"chunks\": [\n")
+	for i, chunk := range result.Chunks {
+		if i > 0 {
+			buf.WriteString(",\n")
+		}
+		
+		// 청크 객체 시작
+		buf.WriteString("    {\n")
+		buf.WriteString(fmt.Sprintf("      \"md5\": %s,\n", jsonString(chunk.MD5)))
+		buf.WriteString(fmt.Sprintf("      \"text\": %s", jsonString(chunk.Text)))
+		
+		// 청크 임베딩이 있으면 한 줄로 직접 작성
+		if chunk.Embeddings != nil {
+			buf.WriteString(",\n      \"embeddings\": ")
+			
+			// 임베딩 배열을 한 줄로 작성
+			embedBytes, _ := json.Marshal(chunk.Embeddings)
+			// 모든 공백 제거
+			embedStr := string(embedBytes)
+			embedStr = strings.ReplaceAll(embedStr, " ", "")
+			embedStr = strings.ReplaceAll(embedStr, "\n", "")
+			
+			// 콤마 뒤에 공백 추가 (가독성)
+			embedStr = strings.ReplaceAll(embedStr, ",", ", ")
+			
+			buf.WriteString(embedStr)
+			buf.WriteString("\n")
+		} else {
+			buf.WriteString("\n")
+		}
+		
+		// 청크 객체 종료
+		buf.WriteString("    }")
+	}
+	
+	// 청크 배열 종료
+	buf.WriteString("\n  ]\n")
+	
+	// JSON 객체 종료
+	buf.WriteString("}\n")
+	
 	// 파일 저장
 	if err := os.WriteFile(outputPath, buf.Bytes(), 0644); err != nil {
 		return fmt.Errorf("failed to write result file: %w", err)
 	}
-
+	
 	return nil
+}
+
+// jsonString은 문자열을 JSON 문자열로 변환합니다.
+func jsonString(s string) string {
+	b, _ := json.Marshal(s)
+	return string(b)
 } 

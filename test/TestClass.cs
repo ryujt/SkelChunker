@@ -46,13 +46,13 @@ namespace TestNamespace
     // 구조체
     public struct TestStruct
     {
-        public int X;
-        public int Y;
+        public int X1;
+        public int Y2;
         
         public TestStruct(int x, int y)
         {
-            X = x;
-            Y = y;
+            X1 = x;
+            Y2 = y;
         }
         
         public double GetDistance()

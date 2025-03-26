@@ -353,7 +353,6 @@ func cleanupText(text string) string {
 func (p *CSharpParser) parseTokens() ([]model.SkeletonNode, []model.Chunk, error) {
 	var nodes []model.SkeletonNode
 	var chunks []model.Chunk
-	existingChunks := make(map[string]model.Chunk)
 
 	// 전체 소스 코드 텍스트
 	originalSource := string(p.content)
@@ -419,17 +418,11 @@ func (p *CSharpParser) parseTokens() ([]model.SkeletonNode, []model.Chunk, error
 						MD5:  methodMD5,
 					})
 
-					// 기존 청크와 MD5 비교
-					if existingChunk, exists := existingChunks[methodMD5]; exists {
-						// 기존 청크가 있으면 그대로 사용
-						chunks = append(chunks, existingChunk)
-					} else {
-						// 새로운 청크 생성
-						chunks = append(chunks, model.Chunk{
-							MD5:  methodMD5,
-							Text: methodContent,
-						})
-					}
+					// 청크 추가 (변경된 메서드만 새로 생성)
+					chunks = append(chunks, model.Chunk{
+						MD5:  methodMD5,
+						Text: methodContent,
+					})
 				}
 
 				nodes = append(nodes, *classNode)

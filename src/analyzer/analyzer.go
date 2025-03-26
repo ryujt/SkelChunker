@@ -48,13 +48,14 @@ func (a *Analyzer) AnalyzeFile(filePath string) (*model.AnalysisResult, error) {
 	skelChunkerPath := filepath.Join(filepath.Dir(filePath), baseFileName[:len(baseFileName)-len(ext)]+".SkelChunker")
 
 	// 기존 SkelChunker 파일이 있는지 확인
+	var existingResult *model.AnalysisResult
 	if existingData, err := os.ReadFile(skelChunkerPath); err == nil {
-		var existingResult model.AnalysisResult
-		if err := json.Unmarshal(existingData, &existingResult); err == nil {
+		existingResult = &model.AnalysisResult{}
+		if err := json.Unmarshal(existingData, existingResult); err == nil {
 			// 파일 전체 MD5 비교
 			if existingResult.MD5 == md5Hash {
 				// 파일이 변경되지 않았으므로 기존 결과 반환
-				return &existingResult, nil
+				return existingResult, nil
 			}
 		}
 	}

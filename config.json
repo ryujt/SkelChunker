@@ -1,6 +1,6 @@
 {
     "folders": [
-        "D:\\Projects\\Personal\\SkelChunker\\test"
+        "./test"
     ],
     "ignore-folders": [
         "node_modules",
@@ -11,6 +11,7 @@
         "obj",
         "venv",
         "docs",
+        "test",
         ".git",
         ".idea",
         ".vscode",
@@ -19,6 +20,24 @@
         ".env.local"
     ],
     "parsers": {
-        ".cs": "csharp_parser"
+        ".java": "java_parser",
+        ".c": "c_parser",
+        ".cpp": "cpp_parser",
+        ".cs": "csharp_parser",
+        ".py": "python_parser",
+        ".js": "javascript_parser",
+        ".ts": "typescript_parser",
+        ".go": "go_parser",
+        ".kt": "kotlin_parser",
+        ".php": "php_parser",
+        ".html": "html_parser"
+    },
+    "embedding": {
+        "enabled": true,
+        "api-key": "",
+        "model-name": "text-embedding-3-large",
+        "vector-dim": 3072,
+        "test-mode": true,
+        "max-text-size": 24576
     }
 }

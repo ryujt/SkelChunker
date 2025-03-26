@@ -3,6 +3,7 @@ package main
 import (
 	"SkelChunker/src/analyzer"
 	"SkelChunker/src/config"
+	"SkelChunker/src/embeddings"
 	"SkelChunker/src/parser"
 	"flag"
 	"fmt"
@@ -44,9 +45,35 @@ func main() {
 
 	// 파서 등록
 	parserFactory.RegisterParser(parser.NewCSharpParser())
+	parserFactory.RegisterParser(parser.NewJavaScriptParser())
+
+	// 임베딩 서비스 설정
+	var embeddingService embeddings.EmbeddingService
+	var embeddingConfig *embeddings.Config
+	
+	if cfg.Embedding.Enabled {
+		embeddingConfig = &embeddings.Config{
+			APIKey:     cfg.Embedding.APIKey,
+			ModelName:  cfg.Embedding.ModelName,
+			VectorDim:  cfg.Embedding.VectorDim,
+			TestMode:   cfg.Embedding.TestMode,
+			MaxTextSize: cfg.Embedding.MaxTextSize,
+		}
+		
+		embeddingService = embeddings.NewOpenAIEmbedding(
+			cfg.Embedding.APIKey,
+			cfg.Embedding.ModelName,
+			cfg.Embedding.TestMode,
+			cfg.Embedding.VectorDim,
+		)
+		
+		fmt.Println("Embedding service initialized with model:", cfg.Embedding.ModelName)
+	} else {
+		fmt.Println("Embedding service is disabled")
+	}
 
 	// 분석기 초기화
-	analyzer := analyzer.NewAnalyzer(parserFactory)
+	analyzer := analyzer.NewAnalyzer(parserFactory, embeddingService, embeddingConfig)
 
 	// 각 폴더 처리
 	for _, folder := range cfg.Folders {

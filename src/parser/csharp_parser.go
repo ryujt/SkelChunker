@@ -3,8 +3,6 @@ package parser
 import (
 	"bufio"
 	"bytes"
-	"crypto/md5"
-	"encoding/hex"
 	"SkelChunker/src/model"
 	"strings"
 	"fmt"
@@ -737,11 +735,6 @@ func needsSpace(current, next Token) bool {
 		return false
 	}
 	return true
-}
-
-func calculateMD5(content string) string {
-	hash := md5.Sum([]byte(content))
-	return hex.EncodeToString(hash[:])
 }
 
 // methodInfo는 메서드 정보를 저장하는 구조체입니다.

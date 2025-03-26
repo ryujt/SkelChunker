@@ -19,15 +19,15 @@ type SkeletonNode struct {
 type Chunk struct {
 	MD5        string    `json:"md5"`
 	Text       string    `json:"text"`
-	Embeddings []float64 `json:"embeddings"`
+	Embeddings []float32 `json:"embeddings,omitempty"`
 }
 
 // AnalysisResult는 파일 분석 결과를 나타내는 구조체입니다.
 type AnalysisResult struct {
 	Path       string         `json:"path"`
-	Filename   string        `json:"filename"`
-	MD5        string        `json:"md5"`
-	Embeddings []float64     `json:"embeddings"`
+	Filename   string         `json:"filename"`
+	MD5        string         `json:"md5"`
+	Embeddings [][]float32    `json:"embeddings,omitempty"`
 	Skeleton   []SkeletonNode `json:"skeleton"`
-	Chunks     []Chunk       `json:"chunks"`
+	Chunks     []Chunk        `json:"chunks"`
 } 

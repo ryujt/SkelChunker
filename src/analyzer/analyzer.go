@@ -88,11 +88,19 @@ func (a *Analyzer) AnalyzeFile(filePath string) (*model.AnalysisResult, error) {
 	// 파일 분석
 	skeleton, chunks, err := parser.Parse(string(content))
 	if err != nil {
+		// 오류 발생 시 기존 SkelChunker 파일이 있다면 삭제
+		if _, err := os.Stat(skelChunkerPath); err == nil {
+			os.Remove(skelChunkerPath)
+		}
 		return nil, fmt.Errorf("failed to parse file: %w", err)
 	}
 
 	// 구조화된 코드가 없는 경우 (skeleton이 nil이거나 비어있는 경우)
 	if skeleton == nil || len(skeleton) == 0 {
+		// 기존 SkelChunker 파일이 있다면 삭제
+		if _, err := os.Stat(skelChunkerPath); err == nil {
+			os.Remove(skelChunkerPath)
+		}
 		// 파일 전체를 하나의 청크로 생성
 		chunks = []model.Chunk{
 			{
@@ -127,10 +135,13 @@ func (a *Analyzer) AnalyzeFile(filePath string) (*model.AnalysisResult, error) {
 		// 파일 전체 임베딩 생성
 		fileEmbeddings, err := a.createEmbeddingsForText(string(content))
 		if err != nil {
-			fmt.Printf("Warning: Failed to create embeddings for file %s: %v\n", filePath, err)
-		} else {
-			result.Embeddings = fileEmbeddings
+			// 임베딩 생성 오류 시 기존 SkelChunker 파일이 있다면 삭제
+			if _, err := os.Stat(skelChunkerPath); err == nil {
+				os.Remove(skelChunkerPath)
+			}
+			return nil, fmt.Errorf("failed to create embeddings for file: %w", err)
 		}
+		result.Embeddings = fileEmbeddings
 
 		// 각 청크에 대한 임베딩 생성
 		for i := range result.Chunks {
@@ -140,8 +151,11 @@ func (a *Analyzer) AnalyzeFile(filePath string) (*model.AnalysisResult, error) {
 			// 청크가 너무 큰 경우 분할하여 임베딩 생성
 			chunkEmbeddings, err := a.createEmbeddingsForText(chunkText)
 			if err != nil {
-				fmt.Printf("Warning: Failed to create embeddings for chunk in file %s: %v\n", filePath, err)
-				continue
+				// 임베딩 생성 오류 시 기존 SkelChunker 파일이 있다면 삭제
+				if _, err := os.Stat(skelChunkerPath); err == nil {
+					os.Remove(skelChunkerPath)
+				}
+				return nil, fmt.Errorf("failed to create embeddings for chunk: %w", err)
 			}
 			
 			// 청크가 분할된 경우 첫 번째 임베딩만 사용

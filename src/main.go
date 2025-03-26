@@ -99,13 +99,13 @@ func main() {
 			result, err := analyzer.AnalyzeFile(path)
 			if err != nil {
 				fmt.Printf("Error analyzing file %s: %v\n", path, err)
-				return nil
+				return nil // 오류가 발생해도 계속 진행
 			}
 
 			// 결과 저장
 			if err := analyzer.SaveResult(result); err != nil {
-				fmt.Printf("Error saving result for file %s: %v\n", path, err)
-				return nil
+				fmt.Printf("Error saving result for %s: %v\n", path, err)
+				return nil // 저장 오류가 발생해도 계속 진행
 			}
 
 			fmt.Printf("Successfully processed: %s\n", path)

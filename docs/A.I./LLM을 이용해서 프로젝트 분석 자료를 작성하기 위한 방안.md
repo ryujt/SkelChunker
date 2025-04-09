@@ -1,4 +1,4 @@
-# Local LLM을 이용해서 프로젝트 분석 자료를 작성하기 위한 방안 정리
+# LLM을 이용해서 프로젝트 분석 자료를 작성하기 위한 방안
 
 ## React.JS 프로젝트 분석 방안
 
@@ -33,9 +33,6 @@ Signup --> Main
 Login --> (signin) : 로그인 시도
 (signin) --> Login : 오류 발생
 (signin) --> Main
-Main --> Content
-Main --> ShuffleTest
-Main --> Settings
 ```
 
 ## Job Flow Diagram
@@ -51,7 +48,5 @@ Main --> Settings
 master: Main
 Object: Main, LoginAPI, UserStore
 Main.OnMount --> LoginAPI.signin
-LoginAPI.signin --> LoginAPI.result.error
-LoginAPI.signin --> LoginAPI.result.Ok
 LoginAPI.result.Ok --> UserStore.setUserInfo
 ```
